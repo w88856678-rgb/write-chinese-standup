@@ -1,0 +1,24 @@
+name: 改进建议
+description: 提议新的创作能力、模板或工作流改进
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景
+      description: 你在什么情况下需要这项能力？
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案
+      description: 希望 Skill 怎样处理？
+    validations:
+      required: true
+  - type: textarea
+    id: provenance
+    attributes:
+      label: 来源与许可证
+      description: 如果参考了外部项目或文本，请提供链接和明确许可证。

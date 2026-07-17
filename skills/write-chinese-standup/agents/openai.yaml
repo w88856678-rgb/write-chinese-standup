@@ -1,0 +1,4 @@
+interface:
+  display_name: "中文脱口秀写作"
+  short_description: "把真实生活素材打磨为可表演、可排练、可持续迭代的中文脱口秀逐字稿"
+  default_prompt: "使用 $write-chinese-standup 把我的一个真实生活观察打磨成可上台表演的中文脱口秀段子。"

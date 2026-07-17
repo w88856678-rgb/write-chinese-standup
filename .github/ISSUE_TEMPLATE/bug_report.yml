@@ -1,0 +1,35 @@
+name: 问题报告
+description: 报告安装、运行、输出或文档问题
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: 请先删除密码、Token、API Key 和可识别个人信息。
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题是什么？
+      description: 请描述你看到的现象。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 如何复现？
+      description: 请提供最少步骤和去敏后的输入。
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 使用环境
+      description: 例如 Codex、操作系统和 Skill 版本。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 你希望发生什么？
+    validations:
+      required: true
