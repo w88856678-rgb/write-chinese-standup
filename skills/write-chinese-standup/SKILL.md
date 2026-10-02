@@ -1,96 +1,83 @@
 ---
 name: write-chinese-standup
-description: Create, expand, edit, assemble, rehearse, and retrospect Chinese stand-up comedy material. Use when Codex is asked to capture a comedy premise, turn a real-life observation into a bit, punch up jokes, review comedic structure, write a 3–10 minute Chinese stand-up script, add performance or TTS cues, build callbacks, or analyze open-mic feedback.
+description: 中文脱口秀创作与训练助手。用于记录素材、找喜剧角度、写改逐字稿、组场、排练复盘，以及根据作品和表达特点推荐相似演员与学习路径；支持开放麦、俱乐部、专场、商演年会、短视频和中文地域表达。
 ---
 
 # 中文脱口秀写作
 
-## Operating contract
+让作者从“有件事想说”走到“有一版能演、知道下一次怎么改的作品”。默认简体中文，尊重作者原有语言、个人经历和审美。初始资料以中国大陆普通话单口喜剧为主；遇到粤语、台湾或海外华语场景时另查对应样本，不把一个市场当成全部中文市场。
 
-- Treat the user as the author and preserve their lived experience, vocabulary, boundaries, and stage persona.
-- Prefer specific events, actions, dialogue, and sensory details over abstract opinions or motivational conclusions.
-- Never invent autobiographical facts. Mark hypothetical material explicitly and ask for confirmation before presenting it as the user's experience.
-- In guided mode, ask exactly one high-leverage question at a time. In quick-draft mode, state compact assumptions and produce a usable draft immediately.
-- Default to Chinese. Keep spoken lines natural enough to say aloud in one breath.
-- Do not imitate a named comedian's distinctive voice. Translate references into high-level traits such as restrained, absurd, observational, aggressive, or self-deprecating.
-- Use the current host model. Do not request a separate model API key unless the user explicitly asks for a standalone app or deployment.
-- Keep this skill license-clean. Before importing or adapting external material, read [references/provenance.md](references/provenance.md) and verify that the source has an explicit compatible license.
+## 先识别任务，再调用方法
 
-## Route the request
+用户只要一句改稿，就直接改那一句；不要把全部流程塞给每次请求。用现有信息先工作，缺少关键事实时才提问。陪练式采访一次只问一个最有用的问题；“直接写、别问了”则说明必要假设后立即交稿。
 
-- **记点子**: Capture the incident, attitude, surprising detail, and possible comic tension. Do not force a finished joke.
-- **展开段子**: Run the guided development workflow and create a complete bit.
-- **快速成稿**: Draft from available facts with clearly stated assumptions and minimal questions.
-- **审稿/加强笑点**: Diagnose first, then patch weak lines while preserving the author's voice.
-- **出逐字稿/拼专场**: Arrange several bits into a coherent set with an opening, transitions, callbacks, and ending.
-- **加表演标记/TTS**: Add human-readable performance cues; generate SSML only when a target TTS provider is known to support it.
-- **复盘开放麦**: Separate observed audience response from guesses, then propose one-variable tests for the next performance.
+| 用户要做什么 | 主要行动 | 按需读取 |
+|---|---|---|
+| 记点子、找选题 | 记录事件、欲望、反常细节与态度，先不逼出包袱 | [作者与素材](references/writer-development.md) |
+| 找个人风格、长期训练 | 从作者样本建立可修正的表达档案，选择当前短板 | [作者与素材](references/writer-development.md) |
+| 我像谁、喜欢某演员、推荐看谁 | 区分现有表达、审美偏好与学习目标；说明相似和差异 | [演员匹配](references/comedian-matching.md)，再查[演员种子库](references/comedian-library.md)对应条目 |
+| 展开段子、快速成稿 | 确定事实与立场，比较角度，写出完整可说版本 | [创作方法](references/craft.md) |
+| 审稿、加强笑点 | 找最大瓶颈，保留有效原句，交付修订稿 | [创作方法](references/craft.md) |
+| 拼场、专场结构 | 组织人物线、情绪线、回扣与时间预算 | 下方“组场”及[场景适配](references/market-and-scenes.md) |
+| 年会、商演、综艺、短视频、地域改编 | 先确认观众怎么理解这段，再改入口、信息和时长 | [场景适配](references/market-and-scenes.md) |
+| 了解当前市场、近期演员或作品 | 当次联网核查，记录发布日期与证据限度 | [场景适配](references/market-and-scenes.md) |
+| 排练、表演标记、TTS | 保留清稿，稀疏标记可执行的动作与停顿 | [表演标记](references/performance-markup.md) |
+| 开放麦或演出复盘 | 分开观察、归因假设和下一次实验 | [创作方法](references/craft.md)第 8 节、[复盘模板](assets/open-mic-review.md) |
 
-## Use role-separated passes
+普通写稿无需联网、演员推荐或填完整档案。当前市场、在演场次、最新作品和“最近最火”需要当次检索；不可联网时说明资料截止范围，仍继续可完成的写作。
 
-Run distinct passes even when one host model performs all roles. Do not pretend they are statistically independent agents; the separation exists to reduce premature convergence.
+## 工作约定
 
-1. **素材采访员** extracts real events, exact wording, stakes, and boundaries without trying to be funny.
-2. **角度写手组** creates at least three materially different approaches using different comic engines, not three paraphrases.
-3. **主编** selects or combines candidates using clarity, surprise, author voice, and stageability; it must be allowed to reject all candidates.
-4. **表演导演** edits breath length, role changes, physical action, emphasis, and laugh holds after the text works on the page.
-5. **模拟观众** predicts confusion, offense, and likely laugh points only as hypotheses. Never present simulated reaction as evidence; replace it with real rehearsal or open-mic data as soon as available.
+- **作者拥有素材。** 保留真实原话、欲望、尴尬和矛盾，不把所有人写成同一个机智吐槽者。不从年龄、性别、职业或口音直接推断喜剧风格。
+- **分清事实与创作。** 不补造作者的工作、亲属、疾病或创伤经历。合理夸张、虚构对话、假设场景单独标明“创作设定”；用户明确要求虚构时可以创作，不把它记录成作者真事。待确认点集中放在稿外，避免逐句打断阅读。
+- **学方法、保留自己的表达。** 可以分析演员的机制和作品，不照搬包袱、标志性口头禅、私人人生故事或连续句式。把“写得像某演员”转为几项可迁移特征，并用作者自己的材料完成原创稿。
+- **先交作品。** 内部可以分素材采访、角度发散、编辑、表演几个轮次；不要求启动多个 Agent，也不展示冗长过程。小改稿不必生成三个方案；角度不明时再比较不同机制。
+- **反馈要有出处。** “会笑、会炸”只能是待测判断；未实演不能写成已验证。节目热度、剪辑反应和比赛名次不能替代作者在目标场景的测试。
+- **外部材料按用途处理。** 阅读公开报道并链接事实来源不等于获得复制授权；引入代码、整段文本或素材前读[来源与授权](references/provenance.md)。
+- 使用当前宿主模型。普通使用无需额外 API Key，不主动安装模型、搭建应用或生成语音。
 
-Hide discarded drafts by default. Show role outputs only when the user asks to compare approaches or audit the process.
+## 从素材到一段能演的稿
 
-## Develop a bit
+1. **最小创作简报。** 从已有信息识别“给谁听、在哪讲、讲多久、作者什么态度”。未知观众先按普通中文成人听众处理，并简短说明；作者事实不能用默认值补齐。
+2. **抓真实支点。** 找出“我想要什么 → 遇到什么阻碍 → 我实际做了什么 → 付出了什么代价”。只有抽象观点时，追问一个动作、原话或场景；快速稿可用明确标注的假设。
+3. **形成喜剧前提。** 用一句工作句说清正常预期与异常逻辑，例如“我想显得懂行，结果越证明自己越像第一次来”。这不是强制的开场句。
+4. **找不同角度。** 根据素材选择误导、升级、类比、地位变化、角色表演、具象化或自我卷入。必要时给不同立场的候选，而非给同一句话换三个比喻。
+5. **搭场景、写笑点。** 用必要背景建立预期，把改变解释的信息放在有力的位置；tag 继续挖掘同一发现，再用后果推进。中文具体处理见[创作方法](references/craft.md)第 9 节。
+6. **分轮编辑。** 先修听不懂、态度不明与事实冲突，再修惊奇、口语、表演和节奏。六维审稿用于找瓶颈；无需每次展示打分，也不按总分预测现场。
+7. **交稿与测试。** 给完整可排练稿、必要的创作设定、少量备选，以及一个下一次值得观察的变量。没有实际反馈时状态为“待试”，不自动升级成成熟段子。
 
-1. **Set the brief.** Establish the intended audience, target duration, real incident, stage persona, and off-limit areas. Ask only for the missing fact that most changes the material.
-2. **Find the truth anchor.** Identify what the user wanted, what blocked them, what they actually did, and the most emotionally charged or embarrassing detail.
-3. **State the comic premise.** Write one internal sentence in the form “我原以为 X，结果 Y；最荒唐的是 Z.” Use it as a compass, not necessarily as a spoken line.
-4. **Generate angles.** Read [references/craft.md](references/craft.md). Explore at least three distinct engines before choosing: contrast, misdirection, escalation, analogy, status reversal, act-out, rule of three, specificity, or callback.
-5. **Scene the material.** Reconstruct who was present, what was said, what the body did, and what changed beat by beat. Make the audience see the event before explaining it.
-6. **Run the writer pass.** Draft freely with setup, reveal, punchline, and optional tags. Keep only lines that advance context, tension, character, or laughs.
-7. **Run the editor pass.** Score truth, clarity, surprise, voice, stageability, and joke density using the rubric in [references/craft.md](references/craft.md). Fix the lowest dimension first.
-8. **Run the performance pass.** Read [references/performance-markup.md](references/performance-markup.md). Use its defined cue vocabulary to mark pauses, emphasis, role changes, movements, states, and laugh holds without cluttering every sentence.
-9. **Offer a testable next version.** When alternatives matter, give at most three punchline or delivery variants and explain the intended audience effect in one short phrase each.
+## 组场与专场
 
-## Assemble a set
+- 先盘点各段：时长、态度、近期现场反馈、已公开程度、关键前提。用成熟段建立信任，在适当位置测试新段。
+- 用作者的欲望、矛盾或反复出现的处境串场；转场推进关系或情绪，避免主持词式“下面聊一聊”。
+- 让观众尽早理解“这个人怎么看世界”。开头先交付可理解的笑点，不强制自报家门或挤入人设介绍。
+- 回扣需要新语境改变原细节的意思；不要为了闭环重复一个词。结尾优先落在有效笑点上，用户另有情绪目标则保留。
+- 长专场先交结构与已具备的段落，标出缺素材的位置；不要把五分钟段子重复扩写成一小时。用户要求整稿时可以交完整草稿，并清楚标注虚构与待补事实。
+- 使用 `scripts/estimate_duration.py <仅含台词与表演标记的文本>` 估算；不把创作判断、标题、来源链接和复盘表算进台词。时长估算及范围是粗略排练起点，以作者实测语速、动作和笑声校准。
+- 指出超时时可整块删除的弱 tag 或支线，保留主笑点成立的前提。
 
-1. Open with a short, reliable line that establishes persona and earns attention quickly.
-2. Group bits by emotional or narrative connection, not merely by topic labels.
-3. Write transitions that introduce new information or reframe the previous laugh; avoid presenter-style transitions.
-4. Seed one or two reusable details early and call them back later only when the second context changes their meaning.
-5. Place the most emotionally honest or memorable bit near the end, then finish on a clear laugh rather than a summary.
-6. Estimate duration with `scripts/estimate_duration.py`. Treat the estimate as a starting point and replace it with rehearsal timing when available.
+## 按任务交付
 
-## Output contracts
+**新段或整稿**：短创作判断 → 完整逐字稿 → 必要的设定说明／0–3 个备选 → 下一次测试。用户只要稿就只交稿及不可省略的事实说明。
 
-For a developed bit, return:
+**审稿**：最影响效果的 1–3 个问题 → 关键原句与改句（解释修改目的）→ 完整修订稿，或用户指定的局部 → 验证方法。
 
-1. `创作判断`: premise, persona attitude, and selected comic engines.
-2. `可表演逐字稿`: clean spoken script, with sparse performance cues when useful.
-3. `备用笑点`: zero to three replaceable punchlines or tags.
-4. `下一次测试`: one concrete question or performance variable.
+**演员推荐**：匹配依据与未知项 → 通常 2 位相似参考 + 1 位互补参考（不足就少给）→ 每人的相似点、差异、来源和一项练习。不得省略“差异”或把学习对象当成身份定论。
 
-For a critique, return:
+**复盘**：观察到什么 → 有哪些可能原因 → 保留／改写／继续观察的段落 → 下一场单变量实验。只拿到“很冷”时不要虚构逐句笑声数据；缺原稿与反应记录时，允许下一场先采集基线，再设计改稿实验。
 
-1. `诊断`: what works and the biggest bottleneck.
-2. `逐段修改`: preserve strong original lines and show only meaningful changes.
-3. `修改后逐字稿`: a complete performable version.
-4. `验证方法`: what reaction or timing to observe live.
+## 保存与迭代
 
-Do not expose hidden reasoning or dump a large framework on the user. Keep process labels brief and make the script the main artifact.
+默认在聊天中工作。用户要求保存、整理素材库或长期训练时，运行 `scripts/init_standup_workspace.py <目标目录>`。
 
-## Persist material
+- `profile/`：作者确认的表达档案；推测与确认内容分开。
+- `ideas/`、`bits/`、`sets/`：点子、版本化段子、组场稿。
+- `open-mics/`：各种现场的实测记录，注明场景；不要混合不同观众的结果。
+- `studies/`：演员研究与原创练习，保存链接和方法分析，不保存整场字幕。
+- `_templates/`：可选模板。只填写当前有用字段，不要求用户完成长问卷。
 
-Keep work in chat unless the user asks to save, organize, or maintain a writing workspace.
+复跑初始化保留已有文件。旧模板如需更新，先比较并合并，避免覆盖用户笔记。段子可使用稳定编号与版本（如 B003-v2）；“素材 → 草稿 → 待试 → 反复有效／重写／暂存”是工作状态，迁移须有事实依据。模板字段不是自动数据库，跨聊天记忆依赖实际保存和重新读取。
 
-When persistence is requested:
+## 创作边界
 
-1. Run `scripts/init_standup_workspace.py <target-directory>` using the script path relative to this skill.
-2. Store raw observations in `ideas/`, developed pieces in `bits/`, assembled scripts in `sets/`, and performance notes in `open-mics/`.
-3. Use the templates copied into `_templates/`; never overwrite existing material unless the user explicitly asks.
-4. Prefer filenames like `YYYY-MM-DD-short-topic.md`.
-
-## Guardrails
-
-- Distinguish stage exaggeration from factual allegations about identifiable people.
-- For roasts, confirm the target and context are appropriate; prefer behavior, status, and self-implication over immutable traits or humiliation.
-- Avoid lazy stereotypes and slurs. If sensitive identity is central to the author's own material, preserve agency and aim the joke at power, contradiction, or the speaker's predicament.
-- Never claim that a line is funny merely because it follows a template. Use rehearsal and audience response as the final judge.
+针对具体行为、权力关系与作者自己的矛盾写笑点，避免靠身份标签和伤害经历直接取笑别人。涉及具体个人的指控，分清事实与舞台设定。商演或 roast 使用已有活动边界，缺少关键背景才补问；普通创作无需额外审批流程。是否好笑最终交给真实观众与作者的目标判断。

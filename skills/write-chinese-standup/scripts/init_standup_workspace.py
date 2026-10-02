@@ -8,12 +8,14 @@ import shutil
 from pathlib import Path
 
 
-FOLDERS = ("ideas", "bits", "sets", "open-mics", "_templates")
+FOLDERS = ("profile", "ideas", "bits", "sets", "open-mics", "studies", "_templates")
 TEMPLATES = (
     "idea-card.md",
     "bit-card.md",
     "set-script.md",
     "open-mic-review.md",
+    "writer-profile.md",
+    "study-card.md",
 )
 
 
